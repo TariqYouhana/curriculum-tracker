@@ -5,105 +5,107 @@
 <title>B.Sc. Data Science & Analytics — Progress Ledger</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
 
 :root{
-  --paper:#F7F4EC;
-  --paper-line:#E4DECB;
-  --ink:#1E2A3A;
-  --ink-soft:#5B6675;
-  --forest:#2F5233;
-  --forest-soft:#DCE7DD;
-  --gold:#A8842C;
-  --gold-soft:#F1E6C6;
-  --brick:#9C3E2B;
-  --brick-soft:#F3DED8;
-  --slate:#7C8798;
+  --cream:#F4EFE6;
+  --ink:#000000;
+  --orange:#FF6B35;
+  --yellow:#FDE047;
+  --white:#FFFFFF;
+  --gray:#6B6B6B;
+  --border:2px;
 }
 *{box-sizing:border-box;}
 body{
   margin:0;
-  background:var(--paper);
+  background:var(--cream);
   background-image:
-    linear-gradient(var(--paper-line) 1px, transparent 1px);
-  background-size: 100% 2.1em;
+    linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
   color:var(--ink);
-  font-family:'Inter',sans-serif;
+  font-family:'Space Mono', 'Courier New', monospace;
   padding:0 0 80px 0;
 }
-.wrap{max-width:920px;margin:0 auto;padding:36px 24px 0;}
+.wrap{max-width:920px;margin:0 auto;padding:24px 20px 0;}
 
 /* Header */
 .masthead{
   display:flex;
   justify-content:space-between;
   align-items:flex-end;
-  border-bottom:3px double var(--ink);
-  padding-bottom:14px;
-  margin-bottom:6px;
-  gap:20px;
+  flex-wrap:wrap;
+  gap:16px;
+  background:var(--white);
+  border:var(--border) solid var(--ink);
+  padding:20px 20px;
+  margin-bottom:0;
 }
 .masthead h1{
-  font-family:'Source Serif 4',serif;
+  font-family:'Space Mono', monospace;
   font-weight:700;
-  font-size:26px;
-  margin:0 0 4px;
-  letter-spacing:0.2px;
+  font-size:24px;
+  margin:0 0 6px;
+  letter-spacing:-0.3px;
+  text-transform:uppercase;
 }
 .masthead .sub{
-  font-family:'IBM Plex Mono',monospace;
-  font-size:12px;
-  color:var(--ink-soft);
+  font-family:'Space Mono', monospace;
+  font-size:11px;
+  color:var(--ink);
   text-transform:uppercase;
-  letter-spacing:1px;
+  letter-spacing:1.5px;
+  border-top:1px solid var(--ink);
+  padding-top:6px;
+  display:inline-block;
 }
-.reset-btn{
-  background:none;
-  border:1px solid var(--slate);
-  color:var(--ink-soft);
-  font-family:'IBM Plex Mono',monospace;
-  font-size:11px;
-  padding:6px 10px;
-  border-radius:3px;
-  cursor:pointer;
-  white-space:nowrap;
-}
-.reset-btn:hover{border-color:var(--brick); color:var(--brick);}
 
-.toolbar{display:flex;gap:8px;flex-shrink:0;}
+.toolbar{display:flex;gap:0;flex-shrink:0; flex-wrap:wrap;}
 .tbtn{
-  font-family:'IBM Plex Mono',monospace;
+  font-family:'Space Mono', monospace;
+  font-weight:700;
   font-size:11px;
-  padding:7px 12px;
-  border-radius:3px;
+  letter-spacing:0.5px;
+  padding:10px 14px;
   cursor:pointer;
   white-space:nowrap;
-  border:1px solid var(--slate);
-  background:none;
-  color:var(--ink-soft);
+  border:var(--border) solid var(--ink);
+  border-left-width:0;
+  background:var(--white);
+  color:var(--ink);
+  text-transform:uppercase;
+  transition:none;
+  border-radius:0;
 }
-.tbtn:hover{border-color:var(--ink); color:var(--ink);}
-.tbtn.primary{background:var(--forest); border-color:var(--forest); color:#fff;}
-.tbtn.primary:hover{background:#264429; color:#fff;}
-.tbtn.primary:disabled{background:var(--paper-line); border-color:var(--paper-line); color:var(--slate); cursor:not-allowed;}
-.tbtn.gold{border-color:var(--gold); color:var(--gold);}
-.tbtn.gold:hover{background:var(--gold-soft); color:var(--gold);}
+.toolbar .tbtn:first-child{border-left-width:var(--border);}
+.tbtn:hover{background:var(--ink); color:var(--white);}
+.tbtn.primary{background:var(--orange); color:var(--ink);}
+.tbtn.primary:hover{background:var(--ink); color:var(--orange);}
+.tbtn.primary:disabled{background:var(--cream); color:var(--gray); cursor:not-allowed;}
+.tbtn.primary:disabled:hover{background:var(--cream); color:var(--gray);}
+.tbtn.gold{background:var(--yellow); color:var(--ink);}
+.tbtn.gold:hover{background:var(--ink); color:var(--yellow);}
 
 .mode-banner{
   display:none;
   align-items:center;
   justify-content:space-between;
-  background:var(--gold-soft);
-  border:1px solid var(--gold);
-  border-radius:4px;
-  padding:8px 14px;
-  margin-bottom:18px;
-  font-family:'IBM Plex Mono',monospace;
+  background:var(--yellow);
+  border:var(--border) solid var(--ink);
+  border-top:none;
+  padding:10px 20px;
+  margin-bottom:0;
+  font-family:'Space Mono', monospace;
+  font-weight:700;
   font-size:11.5px;
-  color:#7A5F1E;
+  color:var(--ink);
+  text-transform:uppercase;
+  letter-spacing:0.5px;
 }
 .mode-banner.show{display:flex;}
-.mode-banner a{color:#7A5F1E; text-decoration:underline; cursor:pointer;}
+.mode-banner a{color:var(--ink); text-decoration:underline; cursor:pointer; font-weight:700;}
+.mode-banner a:hover{background:var(--ink); color:var(--yellow);}
 
 fieldset{border:none; margin:0; padding:0;}
 
@@ -111,98 +113,134 @@ fieldset{border:none; margin:0; padding:0;}
 .summary{
   display:grid;
   grid-template-columns: auto 1fr auto;
-  gap:28px;
-  align-items:center;
-  padding:22px 0 28px;
-  border-bottom:1px solid var(--paper-line);
-  margin-bottom:22px;
+  gap:0;
+  align-items:stretch;
+  background:var(--white);
+  border:var(--border) solid var(--ink);
+  border-top:none;
+  margin-bottom:24px;
 }
 .seal{
-  width:96px;height:96px;border-radius:50%;
-  border:3px solid var(--gold);
+  width:140px;
+  border-radius:0;
+  border:none;
+  border-right:var(--border) solid var(--ink);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  background:var(--gold-soft);
+  background:var(--orange);
   position:relative;
   flex-shrink:0;
+  padding:16px;
 }
-.seal::before{
-  content:'';
-  position:absolute; inset:6px;
-  border:1px dashed var(--gold);
-  border-radius:50%;
-}
-.seal .val{font-family:'Source Serif 4',serif;font-weight:700;font-size:24px;color:var(--ink);}
-.seal .lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--gold);text-transform:uppercase;margin-top:2px;}
+.seal::before{ content:none; }
+.seal .val{font-family:'Space Mono',monospace;font-weight:700;font-size:32px;color:var(--ink);line-height:1;}
+.seal .lbl{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--ink);text-transform:uppercase;margin-top:6px;font-weight:700;}
 
-.progress-block{min-width:0;}
-.progress-top{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);margin-bottom:6px;}
-.progress-top b{color:var(--ink);font-weight:600;}
-.bar-track{height:10px;background:var(--paper-line);border-radius:6px;overflow:hidden;}
-.bar-fill{height:100%;background:linear-gradient(90deg,var(--forest),#4A7A50);border-radius:6px;transition:width .3s ease;}
-.progress-note{font-size:11px;color:var(--slate);margin-top:6px;font-family:'IBM Plex Mono',monospace;}
+.progress-block{min-width:0; padding:18px 20px; border-right:var(--border) solid var(--ink);}
+.progress-top{display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:12px;color:var(--ink);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;}
+.progress-top b{color:var(--ink);font-weight:700;}
+.bar-track{height:16px;background:var(--white);border:1px solid var(--ink);overflow:hidden;border-radius:0;}
+.bar-fill{height:100%;background:var(--orange);border-radius:0;transition:none;}
+.progress-note{font-size:10.5px;color:var(--gray);margin-top:8px;font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:0.3px;}
 
-.mini-stats{display:flex;flex-direction:column;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);text-align:right;}
-.mini-stats span b{color:var(--ink);}
+.mini-stats{display:flex;flex-direction:column;gap:6px;font-family:'Space Mono',monospace;font-size:10.5px;color:var(--ink);text-align:right;padding:18px 20px;text-transform:uppercase;letter-spacing:0.3px;}
+.mini-stats span b{color:var(--ink);font-weight:700;}
 
 /* Category */
-.category{margin-bottom:10px; border:1px solid var(--paper-line); background:rgba(255,255,255,0.35); border-radius:4px; overflow:hidden;}
+.category{margin-bottom:16px; border:var(--border) solid var(--ink); background:var(--white); border-radius:0; overflow:hidden;}
 .cat-head{
   display:flex;justify-content:space-between;align-items:center;
-  padding:13px 16px;cursor:pointer;user-select:none;
-  background:rgba(255,255,255,0.5);
+  padding:14px 18px;cursor:pointer;user-select:none;
+  background:var(--cream);
+  border-bottom:var(--border) solid var(--ink);
 }
-.cat-head:hover{background:rgba(255,255,255,0.8);}
+.cat-head:hover{background:var(--yellow);}
 .cat-title{display:flex;align-items:baseline;gap:10px;}
-.cat-title .chev{font-size:11px;color:var(--slate);transition:transform .2s ease;display:inline-block;}
+.cat-title .chev{font-size:11px;color:var(--ink);transition:none;display:inline-block;}
 .cat-title.open .chev{transform:rotate(90deg);}
-.cat-name{font-family:'Source Serif 4',serif;font-weight:600;font-size:16px;}
-.cat-hint{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--slate);}
-.cat-progress{font-family:'IBM Plex Mono',monospace;font-size:12px;white-space:nowrap;}
-.cat-progress.done{color:var(--forest);}
-.cat-progress.partial{color:var(--gold);}
-.cat-progress.empty{color:var(--slate);}
+.cat-name{font-family:'Space Mono',monospace;font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:0.3px;}
+.cat-hint{font-family:'Space Mono',monospace;font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px;}
+.cat-progress{font-family:'Space Mono',monospace;font-weight:700;font-size:12px;white-space:nowrap;border:1px solid var(--ink);padding:4px 8px;}
+.cat-progress.done{color:var(--ink);background:var(--orange);}
+.cat-progress.partial{color:var(--ink);background:var(--yellow);}
+.cat-progress.empty{color:var(--gray);background:var(--white);}
 
-.cat-body{max-height:0;overflow:hidden;transition:max-height .3s ease;}
-.cat-body.open{max-height:3000px;}
+.cat-body{max-height:0;overflow:hidden;transition:none;}
+.cat-body.open{max-height:none;}
 .course-row{
   display:grid;
-  grid-template-columns: 30px 92px 1fr 44px 96px;
+  grid-template-columns: 30px 100px 1fr 44px 100px;
   align-items:center;
   gap:10px;
-  padding:9px 16px;
-  border-top:1px solid var(--paper-line);
-  font-size:13.5px;
+  padding:10px 18px;
+  border-top:1px solid var(--ink);
+  font-size:12.5px;
 }
-.course-row:nth-child(odd){background:rgba(255,255,255,0.4);}
+.course-row:first-child{border-top:none;}
+.course-row:nth-child(odd){background:var(--cream);}
 .course-row input[type=checkbox]{
-  width:16px;height:16px;accent-color:var(--forest);cursor:pointer;
+  width:18px;height:18px;accent-color:var(--orange);cursor:pointer;
+  border:1px solid var(--ink);
 }
 .course-row input[type=checkbox]:disabled{cursor:not-allowed;}
-.code{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);}
+.code{font-family:'Space Mono',monospace;font-size:11px;color:var(--ink);font-weight:700;}
 .cname{color:var(--ink);}
-.cname.done{color:var(--forest);}
-.credits{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--slate);text-align:right;}
+.cname.done{color:var(--ink); font-weight:700; text-decoration:underline; text-decoration-color:var(--orange); text-decoration-thickness:2px;}
+.credits{font-family:'Space Mono',monospace;font-size:11px;color:var(--gray);text-align:right;font-weight:700;}
 select.grade-select{
-  font-family:'IBM Plex Mono',monospace;
-  font-size:12px;
-  padding:4px 6px;
-  border-radius:3px;
-  border:1px solid var(--paper-line);
-  background:#fff;
+  font-family:'Space Mono',monospace;
+  font-weight:700;
+  font-size:11.5px;
+  padding:5px 6px;
+  border-radius:0;
+  border:1px solid var(--ink);
+  background:var(--white);
   color:var(--ink);
   width:100%;
+  text-transform:uppercase;
 }
-select.grade-select.set{border-color:var(--forest); background:var(--forest-soft);}
-select.grade-select.fail{border-color:var(--brick); background:var(--brick-soft); color:var(--brick);}
-select.grade-select:disabled{background:transparent;border-color:transparent;color:var(--slate);}
+select.grade-select.set{border:2px solid var(--ink); background:var(--yellow); color:var(--ink);}
+select.grade-select.fail{border:2px solid var(--ink); background:var(--ink); color:var(--white);}
+select.grade-select:disabled{background:transparent;border-color:var(--gray);color:var(--gray);}
 
 footer.note{
-  max-width:920px;margin:30px auto 0;padding:0 24px;
-  font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--slate);line-height:1.6;
+  max-width:920px;margin:0 auto 30px;padding:18px 20px;
+  font-family:'Space Mono',monospace;font-size:10.5px;color:var(--ink);line-height:1.7;
+  background:var(--white); border:var(--border) solid var(--ink); border-top:none;
 }
-.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;}
-.legend span{display:flex;align-items:center;gap:5px;}
-.dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:0;text-transform:uppercase;letter-spacing:0.3px;}
+.legend span{display:flex;align-items:center;gap:6px;}
+.dot{width:10px;height:10px;border-radius:0;display:inline-block;border:1px solid var(--ink);}
+
+/* Locked-state prompt — calm, no stripes */
+.locked-banner{
+  display:none;
+  align-items:center;
+  gap:10px;
+  background:var(--white);
+  border:var(--border) solid var(--ink);
+  border-top:none;
+  padding:10px 20px;
+  margin-bottom:0;
+}
+.locked-banner.show{display:flex;}
+.locked-banner span{
+  font-family:'Space Mono', monospace;
+  font-weight:700;
+  font-size:11.5px;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  color:var(--ink);
+}
+
+@keyframes editGlow{
+  0%, 100%{ box-shadow:0 0 0 rgba(255,107,53,0); transform:scale(1); }
+  50%{ box-shadow:0 0 0 6px rgba(255,107,53,0.28); transform:scale(1.015); }
+}
+.tbtn#editBtn.attn{
+  background:var(--orange);
+  color:var(--ink);
+  animation: editGlow 3s ease-in-out infinite;
+}
 </style>
 </head>
 <body>
@@ -213,11 +251,15 @@ footer.note{
       <div class="sub">Curriculum Ledger · Version Fall-2024</div>
     </div>
     <div class="toolbar">
-      <button class="tbtn" id="editBtn">✎ Edit</button>
-      <button class="tbtn primary" id="saveBtn" disabled>Save</button>
-      <button class="tbtn gold" id="pdfBtn">⭳ Download PDF</button>
-      <button class="tbtn" id="resetBtn">Clear all</button>
+      <button class="tbtn" id="editBtn">[ Edit ]</button>
+      <button class="tbtn primary" id="saveBtn" disabled>[ Save ]</button>
+      <button class="tbtn gold" id="pdfBtn">[ Download PDF ]</button>
+      <button class="tbtn" id="resetBtn">[ Clear All ]</button>
     </div>
+  </div>
+
+  <div class="locked-banner" id="lockedBanner">
+    <span>Viewing saved progress — click Edit to make changes.</span>
   </div>
 
   <div class="mode-banner" id="modeBanner">
@@ -246,9 +288,9 @@ footer.note{
 
   <footer class="note">
     <div class="legend">
-      <span><span class="dot" style="background:var(--forest)"></span>Counts toward CGPA (A+ – F)</span>
-      <span><span class="dot" style="background:var(--gold)"></span>Earns credit, no GPA effect (S / P)</span>
-      <span><span class="dot" style="background:var(--brick)"></span>No credit earned (F / U / I / W / R)</span>
+      <span><span class="dot" style="background:var(--orange)"></span>Counts toward CGPA (A+ – F)</span>
+      <span><span class="dot" style="background:var(--yellow)"></span>Earns credit, no GPA effect (S / P)</span>
+      <span><span class="dot" style="background:var(--ink)"></span>No credit earned (F / U / I / W / R)</span>
     </div>
     <div style="margin-top:8px;">
       CGPA = Σ(credits × grade points) ÷ Σ(credits of A+–F graded courses). Where a course has two equivalent codes (e.g. ENG101 / ENG7101), it's listed once — check it off under whichever mode you actually took. Each section locks once you've ticked enough credits to satisfy its requirement; untick a course there to swap in another. The ledger opens locked to your last save — click <b>Edit</b> to make changes, then <b>Save</b> to keep them (or discard to revert). <b>Download PDF</b> exports only completed courses with their credits and your CGPA.
@@ -374,15 +416,15 @@ function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
 
 async function loadState(){
   try{
-    const res = await window.storage.get(STORAGE_KEY, false);
-    if(res && res.value){ state = JSON.parse(res.value); }
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){ state = JSON.parse(raw); }
   }catch(e){ state = {}; }
   draft = deepClone(state);
   render();
 }
 async function persistState(){
-  try{ await window.storage.set(STORAGE_KEY, JSON.stringify(state), false); }
-  catch(e){ console.error('save failed', e); }
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  catch(e){ console.error('save failed', e); alert('Could not save — your browser may be blocking local storage (e.g. private/incognito mode).'); }
 }
 
 function getEntry(id){
@@ -438,7 +480,9 @@ function categoryStats(cat){
 
 function render(){
   document.getElementById('modeBanner').classList.toggle('show', editMode);
+  document.getElementById('lockedBanner').classList.toggle('show', !editMode);
   document.getElementById('editBtn').style.display = editMode ? 'none' : '';
+  document.getElementById('editBtn').classList.toggle('attn', !editMode);
   document.getElementById('saveBtn').disabled = !editMode;
 
   const stats = computeStats();
