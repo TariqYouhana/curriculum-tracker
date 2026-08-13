@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>B.Sc. Data Science & Analytics — Progress Ledger</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --paper:#F7F4EC;
+  --paper-line:#E4DECB;
+  --ink:#1E2A3A;
+  --ink-soft:#5B6675;
+  --forest:#2F5233;
+  --forest-soft:#DCE7DD;
+  --gold:#A8842C;
+  --gold-soft:#F1E6C6;
+  --brick:#9C3E2B;
+  --brick-soft:#F3DED8;
+  --slate:#7C8798;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--paper);
+  background-image:
+    linear-gradient(var(--paper-line) 1px, transparent 1px);
+  background-size: 100% 2.1em;
+  color:var(--ink);
+  font-family:'Inter',sans-serif;
+  padding:0 0 80px 0;
+}
+.wrap{max-width:920px;margin:0 auto;padding:36px 24px 0;}
+
+/* Header */
+.masthead{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  border-bottom:3px double var(--ink);
+  padding-bottom:14px;
+  margin-bottom:6px;
+  gap:20px;
+}
+.masthead h1{
+  font-family:'Source Serif 4',serif;
+  font-weight:700;
+  font-size:26px;
+  margin:0 0 4px;
+  letter-spacing:0.2px;
+}
+.masthead .sub{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px;
+  color:var(--ink-soft);
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+.reset-btn{
+  background:none;
+  border:1px solid var(--slate);
+  color:var(--ink-soft);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  padding:6px 10px;
+  border-radius:3px;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.reset-btn:hover{border-color:var(--brick); color:var(--brick);}
+
+.toolbar{display:flex;gap:8px;flex-shrink:0;}
+.tbtn{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  padding:7px 12px;
+  border-radius:3px;
+  cursor:pointer;
+  white-space:nowrap;
+  border:1px solid var(--slate);
+  background:none;
+  color:var(--ink-soft);
+}
+.tbtn:hover{border-color:var(--ink); color:var(--ink);}
+.tbtn.primary{background:var(--forest); border-color:var(--forest); color:#fff;}
+.tbtn.primary:hover{background:#264429; color:#fff;}
+.tbtn.primary:disabled{background:var(--paper-line); border-color:var(--paper-line); color:var(--slate); cursor:not-allowed;}
+.tbtn.gold{border-color:var(--gold); color:var(--gold);}
+.tbtn.gold:hover{background:var(--gold-soft); color:var(--gold);}
+
+.mode-banner{
+  display:none;
+  align-items:center;
+  justify-content:space-between;
+  background:var(--gold-soft);
+  border:1px solid var(--gold);
+  border-radius:4px;
+  padding:8px 14px;
+  margin-bottom:18px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11.5px;
+  color:#7A5F1E;
+}
+.mode-banner.show{display:flex;}
+.mode-banner a{color:#7A5F1E; text-decoration:underline; cursor:pointer;}
+
+fieldset{border:none; margin:0; padding:0;}
+
+/* Summary strip */
+.summary{
+  display:grid;
+  grid-template-columns: auto 1fr auto;
+  gap:28px;
+  align-items:center;
+  padding:22px 0 28px;
+  border-bottom:1px solid var(--paper-line);
+  margin-bottom:22px;
+}
+.seal{
+  width:96px;height:96px;border-radius:50%;
+  border:3px solid var(--gold);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:var(--gold-soft);
+  position:relative;
+  flex-shrink:0;
+}
+.seal::before{
+  content:'';
+  position:absolute; inset:6px;
+  border:1px dashed var(--gold);
+  border-radius:50%;
+}
+.seal .val{font-family:'Source Serif 4',serif;font-weight:700;font-size:24px;color:var(--ink);}
+.seal .lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--gold);text-transform:uppercase;margin-top:2px;}
+
+.progress-block{min-width:0;}
+.progress-top{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);margin-bottom:6px;}
+.progress-top b{color:var(--ink);font-weight:600;}
+.bar-track{height:10px;background:var(--paper-line);border-radius:6px;overflow:hidden;}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--forest),#4A7A50);border-radius:6px;transition:width .3s ease;}
+.progress-note{font-size:11px;color:var(--slate);margin-top:6px;font-family:'IBM Plex Mono',monospace;}
+
+.mini-stats{display:flex;flex-direction:column;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);text-align:right;}
+.mini-stats span b{color:var(--ink);}
+
+/* Category */
+.category{margin-bottom:10px; border:1px solid var(--paper-line); background:rgba(255,255,255,0.35); border-radius:4px; overflow:hidden;}
+.cat-head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:13px 16px;cursor:pointer;user-select:none;
+  background:rgba(255,255,255,0.5);
+}
+.cat-head:hover{background:rgba(255,255,255,0.8);}
+.cat-title{display:flex;align-items:baseline;gap:10px;}
+.cat-title .chev{font-size:11px;color:var(--slate);transition:transform .2s ease;display:inline-block;}
+.cat-title.open .chev{transform:rotate(90deg);}
+.cat-name{font-family:'Source Serif 4',serif;font-weight:600;font-size:16px;}
+.cat-hint{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--slate);}
+.cat-progress{font-family:'IBM Plex Mono',monospace;font-size:12px;white-space:nowrap;}
+.cat-progress.done{color:var(--forest);}
+.cat-progress.partial{color:var(--gold);}
+.cat-progress.empty{color:var(--slate);}
+
+.cat-body{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.cat-body.open{max-height:3000px;}
+.course-row{
+  display:grid;
+  grid-template-columns: 30px 92px 1fr 44px 96px;
+  align-items:center;
+  gap:10px;
+  padding:9px 16px;
+  border-top:1px solid var(--paper-line);
+  font-size:13.5px;
+}
+.course-row:nth-child(odd){background:rgba(255,255,255,0.4);}
+.course-row input[type=checkbox]{
+  width:16px;height:16px;accent-color:var(--forest);cursor:pointer;
+}
+.course-row input[type=checkbox]:disabled{cursor:not-allowed;}
+.code{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);}
+.cname{color:var(--ink);}
+.cname.done{color:var(--forest);}
+.credits{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--slate);text-align:right;}
+select.grade-select{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px;
+  padding:4px 6px;
+  border-radius:3px;
+  border:1px solid var(--paper-line);
+  background:#fff;
+  color:var(--ink);
+  width:100%;
+}
+select.grade-select.set{border-color:var(--forest); background:var(--forest-soft);}
+select.grade-select.fail{border-color:var(--brick); background:var(--brick-soft); color:var(--brick);}
+select.grade-select:disabled{background:transparent;border-color:transparent;color:var(--slate);}
+
+footer.note{
+  max-width:920px;margin:30px auto 0;padding:0 24px;
+  font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--slate);line-height:1.6;
+}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;}
+.legend span{display:flex;align-items:center;gap:5px;}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="masthead">
+    <div>
+      <h1>B.Sc. in Data Science &amp; Analytics</h1>
+      <div class="sub">Curriculum Ledger · Version Fall-2024</div>
+    </div>
+    <div class="toolbar">
+      <button class="tbtn" id="editBtn">✎ Edit</button>
+      <button class="tbtn primary" id="saveBtn" disabled>Save</button>
+      <button class="tbtn gold" id="pdfBtn">⭳ Download PDF</button>
+      <button class="tbtn" id="resetBtn">Clear all</button>
+    </div>
+  </div>
+
+  <div class="mode-banner" id="modeBanner">
+    <span>Editing — changes aren't saved yet.</span>
+    <a id="discardLink">Discard changes</a>
+  </div>
+
+  <div class="summary">
+    <div class="seal">
+      <div class="val" id="cgpaVal">—</div>
+      <div class="lbl">CGPA</div>
+    </div>
+    <div class="progress-block">
+      <div class="progress-top"><span>Credits Completed</span><b id="creditsLabel">0 / 130</b></div>
+      <div class="bar-track"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
+      <div class="progress-note" id="progressNote">Tick a course, pick a grade — your ledger fills in as you go.</div>
+    </div>
+    <div class="mini-stats">
+      <span>Graded credits: <b id="gradedCredits">0</b></span>
+      <span>Ungraded credits earned: <b id="ungradedCredits">0</b></span>
+      <span>Courses completed: <b id="courseCount">0</b></span>
+    </div>
+  </div>
+
+  <div id="categories"></div>
+
+  <footer class="note">
+    <div class="legend">
+      <span><span class="dot" style="background:var(--forest)"></span>Counts toward CGPA (A+ – F)</span>
+      <span><span class="dot" style="background:var(--gold)"></span>Earns credit, no GPA effect (S / P)</span>
+      <span><span class="dot" style="background:var(--brick)"></span>No credit earned (F / U / I / W / R)</span>
+    </div>
+    <div style="margin-top:8px;">
+      CGPA = Σ(credits × grade points) ÷ Σ(credits of A+–F graded courses). Where a course has two equivalent codes (e.g. ENG101 / ENG7101), it's listed once — check it off under whichever mode you actually took. Each section locks once you've ticked enough credits to satisfy its requirement; untick a course there to swap in another. The ledger opens locked to your last save — click <b>Edit</b> to make changes, then <b>Save</b> to keep them (or discard to revert). <b>Download PDF</b> exports only completed courses with their credits and your CGPA.
+    </div>
+  </footer>
+</div>
+
+<script>
+const GRADE_POINTS = {
+  'A+':4.00,'A':3.75,'A-':3.50,'B+':3.25,'B':3.00,'B-':2.75,'C+':2.50,'C':2.25,'D':2.00,'F':0.00
+};
+const UNGRADED_PASS = ['S','P']; // earns credit, no GPA effect
+const NO_CREDIT = ['U','R','I','W']; // no credit earned, no GPA effect
+const ALL_GRADES = ['A+','A','A-','B+','B','B-','C+','C','D','F','S','U','P','R','I','W'];
+
+const CATEGORIES = [
+  { id:'eng', name:'GED: English Communication Skills', required:6, hint:'both required',
+    courses:[
+      {code:'ENG101 / ENG7101', name:'Basic English', credits:3},
+      {code:'ENG102 / ENG7102', name:'Composition and Communication Skills', credits:3},
+    ]},
+  { id:'besl', name:'GED: BESL 001', required:3, hint:'pick 1',
+    courses:[
+      {code:'BUS101', name:'Introduction to Business', credits:3},
+      {code:'EDC101', name:'Introduction to Entrepreneurship', credits:3},
+      {code:'GEN206', name:'Introduction to Sociology', credits:3},
+    ]},
+  { id:'qsek', name:'GED: QSEK 001-002', required:6, hint:'pick 2',
+    courses:[
+      {code:'GEB101', name:'Basic Biology', credits:3},
+      {code:'GEN203 / GEN7203', name:'Ecological System and Environment', credits:3},
+      {code:'PHY100', name:'Introductory Physics', credits:3},
+      {code:'SOC101 / SOC7101', name:'Introduction to Sociology', credits:3},
+    ]},
+  { id:'culture', name:'GED: Culture and History Knowledge', required:3, hint:'pick 1',
+    courses:[
+      {code:'GEN202 / GEN7202', name:'Eastern Culture and Heritage', credits:3},
+      {code:'GEN204 / GEN7204', name:'Western Thought', credits:3},
+      {code:'GEN226 / GEN7226', name:'Emergence of Bangladesh', credits:3},
+    ]},
+  { id:'genEd', name:'General Education Courses', required:12, hint:'pick 4',
+    courses:[
+      {code:'ACT101 / ACT7101', name:'Financial Accounting', credits:3},
+      {code:'BUS7101', name:'Introduction to Business', credits:3},
+      {code:'ECO101 / ECO7101', name:'Principles of Microeconomics', credits:3},
+      {code:'ECO102 / ECO7102', name:'Introduction to Macroeconomics', credits:3},
+      {code:'FIN101 / FIN7101', name:'Principles of Finance', credits:3},
+      {code:'GEN205 / GEN7205', name:'Introduction to Psychology', credits:3},
+      {code:'GEN206 ', name:'Introduction to Sociology', credits:3},
+      {code:'GEN207 / GEN7207', name:'Industrial Psychology', credits:3},
+      {code:'GEN208 / GEN7208', name:'Introduction to Philosophy', credits:3},
+      {code:'GEN210 / GEN7210', name:'International Relations', credits:3},
+      {code:'GEN211 / GEN7211', name:'Concepts of Journalism & Media Studies', credits:3},
+      {code:'GEN239 / GEN7239', name:'Professional Ethics', credits:3},
+      {code:'ISL103', name:'Information and Society', credits:3},
+      {code:'JPN7101', name:'Elementary Japanese 1', credits:3},
+      {code:'MGT101 / MGT7101', name:'Principles of Management', credits:3},
+      {code:'MKT101 / MKT7101', name:'Principles of Marketing', credits:3},
+      {code:'PPHS102 / PPHS7102', name:'Introduction to Public Health Sciences', credits:3},
+      {code:'SOC317', name:'Sociology of Science and Technology', credits:3},
+    ]},
+  { id:'core', name:'CORE: Core Credits', required:79, hint:'all required',
+    courses:[
+      {code:'CS191', name:'Programming with C', credits:4},
+      {code:'CS295', name:'Programming with Python', credits:4},
+      {code:'CS397', name:'Data Structure & Algorithm', credits:4},
+      {code:'CS399', name:'Artificial Intelligence', credits:4},
+      {code:'DSA101', name:'Introduction to Data Science', credits:4},
+      {code:'DSA201', name:'Data Processing & Storage', credits:4},
+      {code:'DSA303', name:'Regression Analysis', credits:3},
+      {code:'DSA305', name:'Multivariate Analysis', credits:3},
+      {code:'DSA307', name:'Generalized Linear Model', credits:3},
+      {code:'DSA401', name:'Data Mining', credits:4},
+      {code:'DSA403', name:'Machine Learning', credits:4},
+      {code:'DSA405', name:'Big Data & Cloud Computing', credits:4},
+      {code:'DSA407', name:'Data Security & Privacy', credits:3},
+      {code:'DSA499', name:'Data Science Project', credits:6},
+      {code:'MAT101', name:'Differential & Integral Calculus', credits:3},
+      {code:'MAT102', name:'Differential Equations & Special Functions', credits:3},
+      {code:'MAT291', name:'Linear Algebra', credits:3},
+      {code:'MAT295', name:'Discrete Mathematics', credits:3},
+      {code:'MAT397', name:'Numerical Methods & Optimization', credits:4},
+      {code:'STA191', name:'Probability & Statistics', credits:3},
+      {code:'STA293', name:'Probability Distributions', credits:3},
+      {code:'STA395', name:'Statistical Inference', credits:3},
+    ]},
+  { id:'elective1', name:'Elective: Module 1', required:9, hint:'pick 3',
+    courses:[
+      {code:'ECO465 / ECO7465', name:'Basic Econometrics', credits:3},
+      {code:'STA430', name:'Stochastic Processes', credits:3},
+      {code:'STA432', name:'Bayesian Statistics', credits:3},
+      {code:'STA434', name:'Time Series Analysis', credits:3},
+      {code:'STA436', name:'Experimental Design', credits:3},
+      {code:'STA438', name:'Biostatistics', credits:3},
+      {code:'STA440', name:'Information Systems', credits:3},
+    ]},
+  { id:'elective2', name:'Elective: Module 2', required:9, hint:'pick 3',
+    courses:[
+      {code:'BUS420', name:'Business Intelligence', credits:3},
+      {code:'CS410', name:'Deep Learning', credits:3},
+      {code:'CS412', name:'Data Visualization', credits:3},
+      {code:'CS414', name:'Cryptography & Blockchain', credits:3},
+      {code:'CS416', name:'Bioinformatics', credits:3},
+      {code:'CS418', name:'Machine Learning for Health Sciences', credits:3},
+      {code:'CS420', name:'Machine Learning for Cyber Security', credits:3},
+      {code:'FIN7430', name:'Foundation of Financial Technology', credits:3},
+      {code:'FIN7431', name:'System Analysis & Design', credits:3},
+    ]},
+];
+
+// give every course a stable id
+CATEGORIES.forEach(cat=>{
+  cat.courses.forEach(c=>{ c.id = (cat.id+'::'+c.code).replace(/\s+/g,'_'); });
+});
+
+const STORAGE_KEY = 'edu-progress-v1';
+let state = {};       // last SAVED progress { [courseId]: { completed:bool, grade:string } }
+let draft = {};        // working copy while editing
+let editMode = false;
+let openCats = new Set(CATEGORIES.map(c=>c.id).slice(0,1)); // first category open by default
+
+function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+
+async function loadState(){
+  try{
+    const res = await window.storage.get(STORAGE_KEY, false);
+    if(res && res.value){ state = JSON.parse(res.value); }
+  }catch(e){ state = {}; }
+  draft = deepClone(state);
+  render();
+}
+async function persistState(){
+  try{ await window.storage.set(STORAGE_KEY, JSON.stringify(state), false); }
+  catch(e){ console.error('save failed', e); }
+}
+
+function getEntry(id){
+  const src = editMode ? draft : state;
+  return src[id] || { completed:false, grade:'' };
+}
+function setEntry(id, entry){
+  if(!editMode) return; // shouldn't happen — inputs are locked outside edit mode
+  draft[id] = entry;
+  render();
+}
+
+const PROGRAM_TOTAL = CATEGORIES.reduce((sum,cat)=> sum+cat.required, 0);
+
+function computeStats(){
+  let totalCredits = 0, totalCreditsPossible = PROGRAM_TOTAL;
+  let gradedCredits = 0, qualityPoints = 0;
+  let ungradedCredits = 0;
+  let courseCount = 0;
+
+  CATEGORIES.forEach(cat=>{
+    cat.courses.forEach(c=>{
+      const e = getEntry(c.id);
+      if(!e.completed) return;
+      courseCount++;
+      const g = e.grade;
+      if(g in GRADE_POINTS){
+        gradedCredits += c.credits;
+        qualityPoints += c.credits * GRADE_POINTS[g];
+        if(g !== 'F') totalCredits += c.credits;
+      } else if(UNGRADED_PASS.includes(g)){
+        ungradedCredits += c.credits;
+        totalCredits += c.credits;
+      }
+      // NO_CREDIT grades (U,R,I,W) or no grade selected yet: no credit added
+    });
+  });
+
+  const cgpa = gradedCredits > 0 ? (qualityPoints / gradedCredits) : null;
+  return { totalCredits, totalCreditsPossible, gradedCredits, ungradedCredits, courseCount, cgpa };
+}
+
+function categoryStats(cat){
+  let completedCredits = 0;
+  cat.courses.forEach(c=>{
+    const e = getEntry(c.id);
+    if(!e.completed) return;
+    if(e.grade in GRADE_POINTS && e.grade !== 'F') completedCredits += c.credits;
+    else if(UNGRADED_PASS.includes(e.grade)) completedCredits += c.credits;
+  });
+  return completedCredits;
+}
+
+function render(){
+  document.getElementById('modeBanner').classList.toggle('show', editMode);
+  document.getElementById('editBtn').style.display = editMode ? 'none' : '';
+  document.getElementById('saveBtn').disabled = !editMode;
+
+  const stats = computeStats();
+  document.getElementById('cgpaVal').textContent = stats.cgpa===null ? '—' : stats.cgpa.toFixed(2);
+  document.getElementById('creditsLabel').textContent = `${stats.totalCredits} / ${stats.totalCreditsPossible}`;
+  document.getElementById('barFill').style.width = Math.min(100,(stats.totalCredits/stats.totalCreditsPossible)*100)+'%';
+  document.getElementById('gradedCredits').textContent = stats.gradedCredits;
+  document.getElementById('ungradedCredits').textContent = stats.ungradedCredits;
+  document.getElementById('courseCount').textContent = stats.courseCount;
+  const remaining = stats.totalCreditsPossible - stats.totalCredits;
+  document.getElementById('progressNote').textContent = remaining>0
+    ? `${remaining} credits left to reach the ${stats.totalCreditsPossible}-credit minimum.`
+    : `Minimum credit requirement reached.`;
+
+  const wrap = document.getElementById('categories');
+  wrap.innerHTML = '';
+  CATEGORIES.forEach(cat=>{
+    const completedCredits = categoryStats(cat);
+    const isOpen = openCats.has(cat.id);
+    const statusClass = completedCredits>=cat.required ? 'done' : (completedCredits>0 ? 'partial' : 'empty');
+
+    const catEl = document.createElement('div');
+    catEl.className = 'category';
+
+    const head = document.createElement('div');
+    head.className = 'cat-head';
+    head.innerHTML = `
+      <div class="cat-title ${isOpen?'open':''}">
+        <span class="chev">▶</span>
+        <span class="cat-name">${cat.name}</span>
+        <span class="cat-hint">(${cat.hint})</span>
+      </div>
+      <div class="cat-progress ${statusClass}">${completedCredits} / ${cat.required} cr</div>
+    `;
+    head.addEventListener('click', ()=>{
+      if(openCats.has(cat.id)) openCats.delete(cat.id); else openCats.add(cat.id);
+      render();
+    });
+    catEl.appendChild(head);
+
+    const body = document.createElement('div');
+    body.className = 'cat-body' + (isOpen?' open':'');
+    cat.courses.forEach(c=>{
+      const e = getEntry(c.id);
+      const row = document.createElement('div');
+      row.className = 'course-row';
+
+      const wouldExceed = editMode && !e.completed && (completedCredits + c.credits > cat.required);
+
+      const cb = document.createElement('input');
+      cb.type='checkbox'; cb.checked = e.completed;
+      cb.disabled = wouldExceed || !editMode;
+      if(wouldExceed) cb.title = `This section only needs ${cat.required} credits — you've already ticked enough. Untick another course first.`;
+      cb.addEventListener('change', ()=>{
+        if(cb.checked && !e.completed && (completedCredits + c.credits > cat.required)){
+          cb.checked = false;
+          alert(`This section (${cat.name}) only requires ${cat.required} credits. You've already selected enough — untick another course here first.`);
+          return;
+        }
+        setEntry(c.id, { completed: cb.checked, grade: cb.checked ? e.grade : '' });
+      });
+
+      const codeEl = document.createElement('div');
+      codeEl.className='code'; codeEl.textContent = c.code;
+
+      const nameEl = document.createElement('div');
+      nameEl.className='cname' + (e.completed?' done':'');
+      nameEl.textContent = c.name;
+
+      const credEl = document.createElement('div');
+      credEl.className='credits'; credEl.textContent = c.credits+' cr';
+
+      const sel = document.createElement('select');
+      sel.className='grade-select';
+      sel.disabled = !e.completed || !editMode;
+      let opts = `<option value="">${e.completed?'grade…':'—'}</option>`;
+      ALL_GRADES.forEach(g=> opts += `<option value="${g}" ${e.grade===g?'selected':''}>${g}</option>`);
+      sel.innerHTML = opts;
+      if(e.grade === 'F') sel.classList.add('fail');
+      else if(e.grade) sel.classList.add('set');
+      sel.addEventListener('change', ()=>{
+        setEntry(c.id, { completed: true, grade: sel.value });
+      });
+
+      if(wouldExceed) row.style.opacity = '0.45';
+
+      row.appendChild(cb); row.appendChild(codeEl); row.appendChild(nameEl); row.appendChild(credEl); row.appendChild(sel);
+      body.appendChild(row);
+    });
+    catEl.appendChild(body);
+    wrap.appendChild(catEl);
+  });
+}
+
+document.getElementById('editBtn').addEventListener('click', ()=>{
+  editMode = true;
+  draft = deepClone(state);
+  render();
+});
+
+document.getElementById('saveBtn').addEventListener('click', async ()=>{
+  state = deepClone(draft);
+  await persistState();
+  editMode = false;
+  render();
+});
+
+document.getElementById('discardLink').addEventListener('click', ()=>{
+  draft = deepClone(state);
+  editMode = false;
+  render();
+});
+
+document.getElementById('resetBtn').addEventListener('click', async ()=>{
+  if(!confirm('Clear all saved progress on this device? This cannot be undone.')) return;
+  state = {};
+  draft = {};
+  editMode = false;
+  await persistState();
+  render();
+});
+
+document.getElementById('pdfBtn').addEventListener('click', ()=>{
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'pt', format:'a4' });
+  const marginX = 48;
+  let y = 56;
+  const pageH = doc.internal.pageSize.getHeight();
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(16);
+  doc.text('B.Sc. in Data Science & Analytics', marginX, y);
+  y += 18;
+  doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(90,90,90);
+  doc.text('Completed Courses — Curriculum Ledger (Version Fall-2024)', marginX, y);
+  y += 24;
+  doc.setDrawColor(200,200,200);
+  doc.line(marginX, y, 547, y);
+  y += 20;
+
+  doc.setTextColor(20,20,20);
+  const stats = (function(){
+    // compute strictly from saved state, not draft
+    let totalCredits=0, gradedCredits=0, qualityPoints=0, ungradedCredits=0;
+    const rows = [];
+    CATEGORIES.forEach(cat=>{
+      cat.courses.forEach(c=>{
+        const e = state[c.id];
+        if(!e || !e.completed) return;
+        let creditNote = '';
+        if(e.grade in GRADE_POINTS){
+          gradedCredits += c.credits; qualityPoints += c.credits*GRADE_POINTS[e.grade];
+          if(e.grade!=='F') { totalCredits += c.credits; creditNote = c.credits+''; } else creditNote = '0';
+        } else if(UNGRADED_PASS.includes(e.grade)){
+          ungradedCredits += c.credits; totalCredits += c.credits; creditNote = c.credits+'';
+        } else { creditNote = '0'; }
+        rows.push({ category:cat.name, code:c.code, name:c.name, credits:c.credits, grade:e.grade||'—', creditNote });
+      });
+    });
+    const cgpa = gradedCredits>0 ? (qualityPoints/gradedCredits) : null;
+    return { rows, totalCredits, cgpa };
+  })();
+
+  if(stats.rows.length === 0){
+    doc.setFontSize(11);
+    doc.text('No completed courses yet — tick some off and save before exporting.', marginX, y);
+  } else {
+    // table header
+    doc.setFont('helvetica','bold'); doc.setFontSize(9.5);
+    doc.text('COURSE', marginX, y);
+    doc.text('TITLE', marginX+100, y);
+    doc.text('GRADE', 400, y);
+    doc.text('CREDITS', 470, y);
+    doc.text('EARNED', 510, y);
+    y += 6;
+    doc.setDrawColor(230,230,230);
+    doc.line(marginX, y, 547, y);
+    y += 14;
+
+    let lastCat = '';
+    doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
+    stats.rows.forEach(r=>{
+      if(y > pageH - 60){ doc.addPage(); y = 56; }
+      if(r.category !== lastCat){
+        lastCat = r.category;
+        doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(120,100,40);
+        doc.text(lastCat.toUpperCase(), marginX, y);
+        y += 14;
+        doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(20,20,20);
+      }
+      doc.text(r.code, marginX, y);
+      const titleLines = doc.splitTextToSize(r.name, 290);
+      doc.text(titleLines, marginX+100, y);
+      doc.text(r.grade, 400, y);
+      doc.text(String(r.credits), 470, y);
+      doc.text(r.creditNote, 512, y);
+      y += Math.max(14, titleLines.length*12);
+    });
+
+    y += 10;
+    doc.setDrawColor(150,150,150);
+    doc.line(marginX, y, 547, y);
+    y += 20;
+    doc.setFont('helvetica','bold'); doc.setFontSize(11);
+    doc.text(`Total Credits Completed: ${stats.totalCredits}`, marginX, y);
+    y += 16;
+    doc.text(`CGPA: ${stats.cgpa===null ? '—' : stats.cgpa.toFixed(2)}`, marginX, y);
+  }
+
+  doc.save('data-science-transcript.pdf');
+});
+
+loadState();
+</script>
+</body>
+</html>
